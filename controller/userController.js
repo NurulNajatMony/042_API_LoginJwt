@@ -26,7 +26,7 @@ async function register(req, res) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const User = await User.create({
+        const newUser = await User.create({
             email,
             password: hashedPassword
         });
@@ -34,27 +34,26 @@ async function register(req, res) {
         return res.status(201).json({
             message: "Registrasi berhasil.",
             data: {
-                id: User.id,
-                email: User.email
+                id: newUser.id,
+                email: newUser.email
             }
         });
     } catch (error) {
         return res.status(500).json({
-            message: error.message 
+            message: error.message
         });
-    
     }
 }
 
 async function login(req, res) {
     try {
         const { email, password } = req.body;
-        
+
         if (!email || !password) {
             return res.status(400).json({
                 message: "Email dan password wajib diisi."
             });
-        }   
+        }
 
         const user = await User.findOne({
             where: { email }
@@ -73,15 +72,15 @@ async function login(req, res) {
                 message: "Email atau password salah."
             });
         }
-        
+
         const token = jwt.sign(
             {
-                id: user.id, 
-                email: user.email 
+                id: user.id,
+                email: user.email
             },
             process.env.JWT_SECRET,
-            { 
-            expiresIn: process.env.JWT_EXPIRES_IN
+            {
+                expiresIn: process.env.JWT_EXPIRES_IN
             }
         );
 
@@ -89,12 +88,12 @@ async function login(req, res) {
             message: "Login berhasil.",
             token
         });
-        
+
     } catch (error) {
         return res.status(500).json({
             message: error.message
         });
-    }           
+    }
 }
 
 module.exports = {
